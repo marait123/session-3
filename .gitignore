@@ -1,1 +1,3 @@
 /pyenv
+.env_true
+.env

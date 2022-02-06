@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# session-3
-=======
 # Basic Flask Auth - Follow Along
 
 ## Getting Started
@@ -35,12 +32,6 @@ This will install all of the required packages we selected within the `requireme
 
 From within this directory first ensure you are working using your created virtual environment.
 
-Each time you open a new terminal session, run:
-
-```bash
-export FLASK_APP=app.py;
-```
-
 To run the server, execute:
 
 ```bash
@@ -57,4 +48,3 @@ The `--reload` flag will detect file changes and restart the server automaticall
 2. Select a unique tenant domain
 3. Create a new, single page web application
 4. Create a new API
->>>>>>> master
