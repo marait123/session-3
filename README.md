@@ -4,6 +4,8 @@
 
 ### Installing Dependencies
 
+
+
 #### Python 3.7
 
 Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
@@ -27,6 +29,9 @@ This will install all of the required packages we selected within the `requireme
 - [Flask](http://flask.pocoo.org/)  is a lightweight backend microservices framework. Flask is required to handle requests and responses.
 
 - [jose](https://python-jose.readthedocs.io/en/latest/) JavaScript Object Signing and Encryption for JWTs. Useful for encoding, decoding, and verifying JWTS.
+## Environemt Setup 
+1. rename Example_Env file to .env file
+2. fill the variable in the .env file with their proper values for your setup
 
 ## Running the server
 

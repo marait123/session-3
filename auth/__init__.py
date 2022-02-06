@@ -26,6 +26,9 @@ class AuthError(Exception):
         self.status_code = status_code
 
 
+# Auth Header
+
+
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
@@ -58,6 +61,13 @@ def get_token_auth_header():
     token = parts[1]
     return token
 
+def check_permissions(permissions, payload):
+    if 'permissions' not in payload:
+        return False
+    for permission in permissions:
+        if permission not in payload['permissions']:
+            return False
+    return True
 
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
@@ -100,7 +110,7 @@ def verify_decode_jwt(token):
         except jwt.JWTClaimsError:
             raise AuthError({
                 'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please, check the audience and issuer.'
+                'description': 'Incorrect claims. check the audience.'
             }, 401)
         except Exception:
             raise AuthError({
@@ -112,15 +122,31 @@ def verify_decode_jwt(token):
                 'description': 'Unable to find the appropriate key.'
             }, 400)
 
+def requires_auth(permissions):
+    def requires_auth_decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+         
+            
+            try:
+                token = get_token_auth_header()
+            except AuthError:
+                abort(401)
+            try:
+                print('token ', token)
+                
+                payload = verify_decode_jwt(token)
+                print('payload ', payload)
 
-def requires_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        token = get_token_auth_header()
-        try:
-            payload = verify_decode_jwt(token)
-        except:
-            abort(401)
-        return f(payload, *args, **kwargs)
+                is_authorized = check_permissions(permissions, payload)
+                if not is_authorized:
+                    print("you're not authorized")
+                    raise AuthError("you are n't authorized", 403)
+            except AuthError:
+                abort(403)
+            except:
+                abort(401)
+            return f(payload, *args, **kwargs)
 
-    return wrapper
+        return wrapper
+    return requires_auth_decorator

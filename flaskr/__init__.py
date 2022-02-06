@@ -4,7 +4,7 @@ from flask import Flask, json, request, jsonify, abort
 
 from models import setup_db, Greeting
 from flask_cors import CORS
-from auth import test_import
+from auth import test_import, requires_auth
 from dotenv import load_dotenv
 import os
 # make sure you create a database named hello in psql
@@ -53,7 +53,8 @@ def create_app(test_config=None):
 
 
     @app.route('/greetings', methods=['GET'])
-    def greeting_all():
+    @requires_auth(["get:greetings"])
+    def greeting_all(payload):
         test_import()
         page = request.args.get('page',1, type=int)
         pagination = Greeting.query.paginate(page, per_page=Page_count,error_out=False)
@@ -66,7 +67,8 @@ def create_app(test_config=None):
 
 
     @app.route('/greetings/<lang>', methods=['GET'])
-    def greeting_one(lang):
+    @requires_auth(["get:greetings"])
+    def greeting_one(payload,lang):
         greeting = Greeting.query.filter_by(lang = lang).first()
         print(lang)
         # if(lang not in greetings):
@@ -76,7 +78,8 @@ def create_app(test_config=None):
 
 
     @app.route('/greetings', methods=['POST'])
-    def greeting_add():
+    @requires_auth(["post:greetings"])
+    def greeting_add(payload):
         info = request.get_json()
         if('lang' not in info or 'greeting' not in info):
             abort(422)
@@ -103,6 +106,19 @@ def create_app(test_config=None):
         "success": False, 
         "error": 404,
         }), 404
+    @app.errorhandler(401)
+    def unprocessable(error):
+        return jsonify({
+        "success": False, 
+        "error": 401,
+        }), 401
+    
+    @app.errorhandler(403)
+    def unprocessable(error):
+        return jsonify({
+        "success": False, 
+        "error": 403,
+        }), 403
     return app
     # if __name__ == "__main__":
     #     app.run(debug=True)
