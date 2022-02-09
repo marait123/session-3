@@ -6,8 +6,6 @@ from jose import jwt
 from urllib.request import urlopen
 import os
 SECRET_KEY = os.getenv("MY_SECRET")
-
-
 # AUTH0_DOMAIN = "herfy.us.auth0.com"
 # ALGORITHMS = ['RS256']
 # API_AUDIENCE = "flask_recap_api"

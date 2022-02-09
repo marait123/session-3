@@ -1,23 +1,33 @@
 from distutils.core import setup
 from logging import debug
-from flask import Flask, json, request, jsonify, abort
+from flask import Flask, json, request, jsonify, abort,render_template
 
 from models import setup_db, Greeting
 from flask_cors import CORS
 from auth import test_import, requires_auth
 from dotenv import load_dotenv
 import os
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 # make sure you create a database named hello in psql
 
 Page_count=2
 def create_app(test_config=None):
     load_dotenv()
-    app = Flask(__name__)
+    app = Flask(__name__,template_folder='../templates')
     database_name = "hello"
     username=os.getenv("PSQL_USER")
     password=os.getenv("PSQL_PASSWORD")
     database_path = 'postgresql://{}:{}@localhost:5432/{}'.format(username,password,
         database_name)
+    
+    
+    limiter = Limiter(
+        app,
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"]
+    )
     # print("username ", username)
     # print("password ", password)
     setup_db(app,database_path)
@@ -119,6 +129,12 @@ def create_app(test_config=None):
         "success": False, 
         "error": 403,
         }), 403
-    return app
     # if __name__ == "__main__":
     #     app.run(debug=True)
+
+    @app.route('/hello')
+    @limiter.limit('1 per day')
+    def hello_world():
+        return render_template("index.html")
+                               
+    return app
