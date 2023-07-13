@@ -12,11 +12,14 @@ SECRET_KEY = os.getenv("MY_SECRET")
 AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
 ALGORITHMS = ['RS256']
 API_AUDIENCE = os.getenv("API_AUDIENCE")
+
+
 def test_import():
     print("hello all ")
     print(AUTH0_DOMAIN)
     print(ALGORITHMS)
     print(API_AUDIENCE)
+
 
 class AuthError(Exception):
     def __init__(self, error, status_code):
@@ -59,6 +62,7 @@ def get_token_auth_header():
     token = parts[1]
     return token
 
+
 def check_permissions(permissions, payload):
     if 'permissions' not in payload:
         return False
@@ -66,6 +70,7 @@ def check_permissions(permissions, payload):
         if permission not in payload['permissions']:
             return False
     return True
+
 
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
@@ -116,23 +121,23 @@ def verify_decode_jwt(token):
                 'description': 'Unable to parse authentication token.'
             }, 400)
     raise AuthError({
-                'code': 'invalid_header',
+        'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
-            }, 400)
+    }, 400)
+
 
 def requires_auth(permissions):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-         
-            
+
             try:
                 token = get_token_auth_header()
             except AuthError:
                 abort(401)
             try:
                 print('token ', token)
-                
+
                 payload = verify_decode_jwt(token)
                 print('payload ', payload)
 
